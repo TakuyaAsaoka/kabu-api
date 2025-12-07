@@ -29,4 +29,4 @@ def compute_rsi(df: pd.DataFrame, period: int = 14) -> float:
   # RSI 計算
   rsi = 100 - (100 / (1 + ma_up / ma_down))
 
-  return rsi.iloc[-1]  # 最新値を返す
+  return rsi.iloc[-1].values[0]  # 最新値を返す

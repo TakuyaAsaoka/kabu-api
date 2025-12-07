@@ -1,5 +1,5 @@
 from fastapi import FastAPI
-from .routers import rsi
+from .controllers import rsi
 
 app = FastAPI(
   title="Kabu API",
