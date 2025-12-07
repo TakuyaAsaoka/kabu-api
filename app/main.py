@@ -7,7 +7,7 @@ app = FastAPI(
   version="1.0.0"
 )
 
-app.include_router(rsi.router)
+app.include_router(score.router)
 
 @app.get("/")
 def root():
