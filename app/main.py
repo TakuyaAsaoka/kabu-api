@@ -1,5 +1,5 @@
 from fastapi import FastAPI
-from .controllers import rsi
+from .controllers import score
 
 app = FastAPI(
   title="Kabu API",
