@@ -2,7 +2,7 @@ from fastapi import APIRouter
 from ..repositories.market_data import get_price_data
 from ..schemas.score import ScoreResponse
 from ..services.rsi import compute_rsi
-from ..services.scoring_market_condition import scoring_nikkei_momentum
+from ..services.market_condition import scoring_nikkei_momentum
 
 router = APIRouter(prefix="/score", tags=["Score"])
 
