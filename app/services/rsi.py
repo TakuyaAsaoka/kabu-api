@@ -1,6 +1,6 @@
 import pandas as pd
 
-def compute_rsi(df: pd.DataFrame, period: int = 14) -> float:
+def compute_rsi(df: pd.DataFrame) -> float:
   """
   RSIを計算して最新値を返す
 
@@ -17,6 +17,7 @@ def compute_rsi(df: pd.DataFrame, period: int = 14) -> float:
       最新日のRSI値
   """
   delta = df['Close'].diff()
+  period = 14
 
   # 上昇分と下降分に分ける
   up = delta.clip(lower=0)
