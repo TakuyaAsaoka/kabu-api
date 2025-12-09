@@ -24,13 +24,3 @@ def scoring_nikkei_momentum(rsi: float) -> float:
     return 50 + (rsi - 50) * 1.5
   else:
     return 0.0
-
-def scoring_exchange_rate_assessment_yen_depreciation() -> float:
-  data = get_usd_jpy_history()
-  close_prices = data['Close']
-
-  current_price = close_prices.iloc[-1]
-  median = close_prices.median()
-
-  exchange_rate_assessment_yen_depreciation = (current_price - median) / median
-  return exchange_rate_assessment_yen_depreciation
