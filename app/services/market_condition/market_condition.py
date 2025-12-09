@@ -1,7 +1,5 @@
 # 1.地合い
 # 1 日経平均モメンタム評価
-from app.repositories.market_data import get_usd_jpy_history
-
 
 def scoring_nikkei_momentum(rsi: float) -> float:
   """

@@ -8,8 +8,6 @@ def compute_rsi(df: pd.DataFrame) -> float:
   ----------
   df : pd.DataFrame
       'Close' カラムを持つ株価データ
-  period : int
-      RSI計算期間（デフォルト14日）
 
   Returns
   -------

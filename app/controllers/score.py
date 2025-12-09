@@ -1,5 +1,5 @@
 from fastapi import APIRouter
-from ..repositories.market_data import get_price_data, get_usd_jpy_history
+from ..repositories.market_data import get_price_data
 from ..schemas.score import ScoreResponse
 from app.services.market_condition.rsi import compute_rsi
 from app.services.market_condition.market_condition import scoring_nikkei_momentum
