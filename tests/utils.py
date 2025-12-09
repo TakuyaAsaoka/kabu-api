@@ -1,8 +1,7 @@
 import numpy as np
 import pandas as pd
 
-
-def make_dummy_yf_download_dummy_data() -> pd.DataFrame:
+def make_yf_download_dummy_df() -> pd.DataFrame:
   # 期間インデックスを作成
   date_index = pd.date_range("2025-11-01", "2025-11-30", freq="B")  # B=BusinessDay
 
@@ -42,5 +41,28 @@ def make_dummy_yf_download_dummy_data() -> pd.DataFrame:
   for kind in ["Close", "High", "Low", "Open"]:
     dummy_df[(kind, ticker)] = dummy_df[(kind, ticker)].astype(float).round(3)
   dummy_df[("Volume", ticker)] = dummy_df[("Volume", ticker)].astype("Int64")
+
+  return dummy_df
+
+def make_usd_jpy_dummy_df() -> pd.DataFrame:
+  dates = pd.date_range("2025-11-01", "2025-11-30", freq="B")
+  n = len(dates)
+  np.random.seed(42)
+
+  # 緩やかな上昇トレンド + ノイズ
+  close = np.linspace(104, 156, n) + np.random.normal(0, 0.3, n)
+  open_ = close + np.random.normal(0, 0.1, n)
+  high = np.maximum(open_, close) + 0.3
+  low = np.minimum(open_, close) - 0.3
+
+  dummy_df = pd.DataFrame({
+    "Open": open_,
+    "High": high,
+    "Low": low,
+    "Close": close,
+    "Volume": 0,
+    "Dividends": 0.0,
+    "Stock Splits": 0.0,
+  }, index=dates).round(6)
 
   return dummy_df

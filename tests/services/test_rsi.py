@@ -1,7 +1,7 @@
 from app.services.rsi import compute_rsi
-from tests.utils import make_dummy_yf_download_dummy_data
+from tests.utils import make_yf_download_dummy_df
 
-dummy_df = make_dummy_yf_download_dummy_data()
+dummy_df = make_yf_download_dummy_df()
 
 class TestComputeRSI:
   def test_floatを返す(self):

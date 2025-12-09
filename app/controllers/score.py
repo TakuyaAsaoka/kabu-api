@@ -1,5 +1,5 @@
 from fastapi import APIRouter
-from ..repositories.market_data import get_price_data
+from ..repositories.market_data import get_price_data, get_usd_jpy_history
 from ..schemas.score import ScoreResponse
 from ..services.rsi import compute_rsi
 from ..services.market_condition import scoring_nikkei_momentum
@@ -11,6 +11,9 @@ def score_ticker(ticker: str):
   df = get_price_data(ticker)
   computed_rsi = compute_rsi(df = df)
   scored_nikkei_momentum = scoring_nikkei_momentum(rsi = computed_rsi)
+  test = get_usd_jpy_history()
+  print('test:')
+  print(test)
   return {
     "ticker": ticker,
     "market_condition": {
