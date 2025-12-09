@@ -1,6 +1,12 @@
+import math
+from unittest.mock import patch
 
 import pytest
 from app.controllers.score import scoring_nikkei_momentum
+from app.services.market_condition import scoring_exchange_rate_assessment_yen_depreciation
+from tests.utils import make_usd_jpy_dummy_df
+
+dummy_usd_jpy_df = make_usd_jpy_dummy_df()
 
 # 複数のテストケースを一括で定義するためのpytestの機能
 @pytest.mark.parametrize("rsi, expected", [
@@ -22,3 +28,15 @@ from app.controllers.score import scoring_nikkei_momentum
 def test_scoring_nikkei_momentum(rsi, expected):
   result = scoring_nikkei_momentum(rsi)
   assert result == pytest.approx(expected)
+
+@patch("app.services.market_condition.get_usd_jpy_history")
+def test_為替環境評価を正しく算出できる(mock_get_history):
+  mock_get_history.return_value = dummy_usd_jpy_df
+
+  actual = scoring_exchange_rate_assessment_yen_depreciation()
+
+  median = dummy_usd_jpy_df['Close'].median()
+  current = dummy_usd_jpy_df['Close'].iloc[-1]
+  expected = (current - median) / median
+
+  assert math.isclose(actual, expected, rel_tol=1e-9)
