@@ -1,8 +1,5 @@
 import pytest
 from app.controllers.score import scoring_nikkei_momentum
-from tests.utils import make_usd_jpy_dummy_df
-
-dummy_usd_jpy_df = make_usd_jpy_dummy_df()
 
 # 複数のテストケースを一括で定義するためのpytestの機能
 @pytest.mark.parametrize("rsi, expected", [

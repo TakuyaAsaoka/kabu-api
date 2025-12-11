@@ -44,7 +44,7 @@ def make_yf_download_dummy_df() -> pd.DataFrame:
 
   return dummy_df
 
-def make_usd_jpy_dummy_df() -> pd.DataFrame:
+def make_symbol_history_dummy_df() -> pd.DataFrame:
   dates = pd.date_range("2025-11-01", "2025-11-30", freq="B")
   n = len(dates)
   np.random.seed(42)
