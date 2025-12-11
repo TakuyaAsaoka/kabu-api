@@ -7,8 +7,8 @@ from app.services.market_condition.market_condition import scoring_nikkei_moment
 router = APIRouter(prefix="/score", tags=["Score"])
 
 @router.get("/{ticker}", response_model=ScoreResponse)
-def score_ticker(ticker: str):
-  df = get_price_data(ticker)
+def score_ticker(ticker: str, period: str):
+  df = get_price_data(ticker, period)
   computed_rsi = compute_rsi(df = df)
   scored_nikkei_momentum = scoring_nikkei_momentum(rsi = computed_rsi)
 

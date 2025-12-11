@@ -29,7 +29,7 @@ def test_score_tickerは200レスポンスと正しいbodyを返す(
     )
   )
 
-  response = client.get(f"/score/{expected.ticker}")
+  response = client.get(f"/score/{expected.ticker}?period=5y")
 
   assert response.status_code == 200
 
