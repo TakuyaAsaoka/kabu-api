@@ -7,7 +7,7 @@ class CommonParameter(BaseModel):
 
 class NikkeiMomentum(BaseModel):
   score: float
-  computed_rsi: float
+  rsi: float
 
 class MarketCondition(BaseModel):
   nikkei_momentum: NikkeiMomentum
@@ -18,8 +18,13 @@ class Trend(BaseModel):
   ma_n: float
   deviation_rate: float
 
+class ShortTermOverheatingAssessment(BaseModel):
+  score: float
+  rsi: float
+
 class Technical(BaseModel):
   trend: Trend
+  short_term_overheating_assessment: ShortTermOverheatingAssessment
 
 class ScoreResponse(BaseModel):
   common_parameter: CommonParameter

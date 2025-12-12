@@ -14,3 +14,7 @@ def scoring_trend(deviation_rate: float) -> float:
     return 100.0
   else:
     return 50 + (deviation_rate * 2)
+
+# 2 短期過熱感評価
+def scoring_short_term_overheating_assessment(rsi: float) -> float:
+  return max(0.0, 100.0 - ((rsi - 50) ** 2) / 20)
