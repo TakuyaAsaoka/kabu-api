@@ -6,8 +6,10 @@ def compute_divergence() -> float:
   data = get_symbol_history(dummy_ticker, "2y")
   close_prices = data['Close']
 
-  current_price = close_prices.iloc[-1]
-  median = close_prices.median()
+  current_price_series = close_prices.iloc[-1]
+  current_price = float(current_price_series.iloc[0])
+  median_series = close_prices.median()
+  median = float(median_series.iloc[0])
 
   divergence = (current_price - median) / median
   return divergence

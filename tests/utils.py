@@ -44,25 +44,43 @@ def make_yf_download_dummy_df() -> pd.DataFrame:
 
   return dummy_df
 
-def make_symbol_history_dummy_df() -> pd.DataFrame:
+def make_symbol_history_dummy_df(symbol="7203.T") -> pd.DataFrame:
+  # 営業日ベースの日付
   dates = pd.date_range("2025-11-01", "2025-11-30", freq="B")
   n = len(dates)
   np.random.seed(42)
 
-  # 緩やかな上昇トレンド + ノイズ
-  close = np.linspace(104, 156, n) + np.random.normal(0, 0.3, n)
-  open_ = close + np.random.normal(0, 0.1, n)
-  high = np.maximum(open_, close) + 0.3
-  low = np.minimum(open_, close) - 0.3
+  # 緩やかな上昇トレンド + ノイズ（float64）
+  close = (np.linspace(104, 156, n) + np.random.normal(0, 0.3, n)).astype("float64")
+  open_ = (close + np.random.normal(0, 0.1, n)).astype("float64")
+  high = (np.maximum(open_, close) + 0.3).astype("float64")
+  low = (np.minimum(open_, close) - 0.3).astype("float64")
 
-  dummy_df = pd.DataFrame({
+  # ベースとなる DataFrame（Series の形）
+  base = pd.DataFrame({
     "Open": open_,
     "High": high,
     "Low": low,
     "Close": close,
-    "Volume": 0,
-    "Dividends": 0.0,
-    "Stock Splits": 0.0,
+    "Volume": np.zeros(n, dtype="int64"),
+    "Dividends": np.zeros(n, dtype="float64"),
+    "Stock Splits": np.zeros(n, dtype="float64"),
   }, index=dates).round(6)
+
+  # 本物データ同様、「価格種別 × 銘柄」の列マルチインデックスに変換
+  #   1) 列を第一階層=価格種別 ('Open','High','Low','Close','Volume','Dividends','Stock Splits')
+  #   2) 第二階層=銘柄 ('7203.T') にする
+  arrays = [
+    base.columns,                    # 第一階層（価格種別）
+    [symbol] * len(base.columns),    # 第二階層（銘柄）
+  ]
+  columns = pd.MultiIndex.from_arrays(arrays, names=["Price", "Ticker"])
+  # 価格種別を最初の軸に保ったまま、銘柄軸を追加（列数が増える）
+  # DataFrame を列方向に広げる
+  dummy_df = pd.DataFrame(
+    np.column_stack([base[c] for c in base.columns]),
+    index=base.index,
+    columns=columns
+  )
 
   return dummy_df

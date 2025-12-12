@@ -13,8 +13,10 @@ class TestComputeDivergence:
 
     actual = compute_divergence()
 
-    median = dummy_symbol_history_df['Close'].median()
-    current = dummy_symbol_history_df['Close'].iloc[-1]
+    median_series = dummy_symbol_history_df['Close'].median()
+    median = float(median_series.iloc[0])
+    current_series = dummy_symbol_history_df['Close'].iloc[-1]
+    current = float(current_series.iloc[0])
     expected = (current - median) / median
 
     assert math.isclose(actual, expected, rel_tol=1e-9)
