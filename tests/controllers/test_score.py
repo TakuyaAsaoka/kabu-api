@@ -2,11 +2,13 @@ from fastapi.testclient import TestClient
 from unittest.mock import patch
 from app.main import app
 from app.schemas.score import ScoreResponse, MarketCondition, NikkeiMomentum, CommonParameter, Technical, Trend, \
-  ShortTermOverheatingAssessment, VolumeAssessment
+  ShortTermOverheatingAssessment, VolumeAssessment, PriceBandVolumeAssessment
 from tests.utils import make_yf_download_dummy_df
 
 client = TestClient(app)
 
+@patch("app.controllers.score.compute_price_band_volume_ratio")
+@patch("app.controllers.score.scoring_price_band_volume_assessment")
 @patch("app.controllers.score.compute_average_volume")
 @patch("app.controllers.score.scoring_volume_assessment")
 @patch("app.controllers.score.scoring_short_term_overheating_assessment")
@@ -25,7 +27,9 @@ def test_score_tickerは200レスポンスと正しいbodyを返す(
   mock_scoring_trend,
   mock_scoring_short_term_overheating_assessment,
   mock_scoring_volume_assessment,
-  mock_compute_average_volume
+  mock_compute_average_volume,
+  mock_scoring_price_band_volume_assessment,
+  mock_compute_price_band_volume_ratio
 ):
   symbol = "7203.T"
   period = "5y"
@@ -41,6 +45,10 @@ def test_score_tickerは200レスポンスと正しいbodyを返す(
 
   mock_compute_average_volume.return_value = 10
   mock_scoring_volume_assessment.return_value = 82.4
+
+  band_ratio=0.05
+  mock_compute_price_band_volume_ratio.return_value = 0.21
+  mock_scoring_price_band_volume_assessment.return_value = 30.8
 
   expected = ScoreResponse(
     common_parameter=CommonParameter(
@@ -69,6 +77,11 @@ def test_score_tickerは200レスポンスと正しいbodyを返す(
         score=mock_scoring_volume_assessment.return_value,
         ave_vol_short=mock_compute_average_volume.return_value,
         ave_vol_long=mock_compute_average_volume.return_value,
+      ),
+      price_band_volume_assessment=PriceBandVolumeAssessment(
+        score=mock_scoring_price_band_volume_assessment.return_value,
+        price_band_volume_ratio=mock_compute_price_band_volume_ratio.return_value,
+        band_ratio=band_ratio
       )
     )
   )

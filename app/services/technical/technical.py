@@ -23,3 +23,7 @@ def scoring_short_term_overheating_assessment(rsi: float) -> float:
 def scoring_volume_assessment(ave_vol_short: float, ave_vol_long: float) -> float:
   score = 50.0 + ((ave_vol_short / ave_vol_long) - 1.0) * 50.0
   return max(0.0, min(100.0, score))
+
+# 4 価格帯別出来高評価
+def scoring_price_band_volume_assessment(price_band_volume_ratio: float) -> float:
+  return min(100.0, price_band_volume_ratio * 1000)

@@ -27,10 +27,16 @@ class VolumeAssessment(BaseModel):
   ave_vol_short: float
   ave_vol_long: float
 
+class PriceBandVolumeAssessment(BaseModel):
+  score: float
+  price_band_volume_ratio: float
+  band_ratio: float
+
 class Technical(BaseModel):
   trend: Trend
   short_term_overheating_assessment: ShortTermOverheatingAssessment
   volume_assessment: VolumeAssessment
+  price_band_volume_assessment: PriceBandVolumeAssessment
 
 class ScoreResponse(BaseModel):
   common_parameter: CommonParameter

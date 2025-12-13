@@ -23,7 +23,7 @@ class TestGetPriceData:
     mock_download.return_value = dummy_download_df
 
     get_price_data(dummy_ticker, "5y")
-    mock_download.assert_called_once_with(dummy_ticker, period="5y")
+    mock_download.assert_called_once_with(dummy_ticker, period="5y", auto_adjust=False)
 
   @patch("app.repositories.market_data.yf.download")
   def test_例外が出た時エラーを返す(self, mock_download):
