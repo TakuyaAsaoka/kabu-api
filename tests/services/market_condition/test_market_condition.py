@@ -1,5 +1,7 @@
 import pytest
 from app.controllers.score import scoring_nikkei_momentum
+from app.services.market_condition.market_condition import scoring_weak_yen_env_assess
+
 
 # 複数のテストケースを一括で定義するためのpytestの機能
 @pytest.mark.parametrize("rsi, expected", [
@@ -21,3 +23,22 @@ from app.controllers.score import scoring_nikkei_momentum
 def test_日経平均モメンタムを正しく算出できる(rsi, expected):
   result = scoring_nikkei_momentum(rsi)
   assert result == pytest.approx(expected)
+
+@pytest.mark.parametrize(
+  "current_rate, m_avg_median, q10, q90, expected",
+  [
+    # 中央値と同じ → 50
+    (145.0, 145.0, 140.0, 150.0, 50.0),
+    # 中央値より上 → スコア計算 50～100
+    (147.5, 145.0, 140.0, 150.0, 75.0),
+    # 中央値より下 → スコア計算 0～50
+    (142.5, 145.0, 140.0, 150.0, 25.0),
+    # q10 より小さい → スコア下限 0 にクリップ
+    (130.0, 145.0, 140.0, 150.0, 0.0),
+    # q90 より大きい → スコア上限 100 にクリップ
+    (155.0, 145.0, 140.0, 150.0, 100.0),
+  ]
+)
+def test_為替環境評価を正しく算出できる(current_rate, m_avg_median, q10, q90, expected):
+  score = scoring_weak_yen_env_assess(current_rate, m_avg_median, q10, q90)
+  assert score == pytest.approx(expected)

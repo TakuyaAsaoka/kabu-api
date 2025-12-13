@@ -2,11 +2,15 @@ from fastapi.testclient import TestClient
 from unittest.mock import patch
 from app.main import app
 from app.schemas.score import ScoreResponse, MarketCondition, NikkeiMomentum, CommonParameter, Technical, Trend, \
-  ShortTermOverheatingAssessment, VolumeAssessment, PriceBandVolumeAssessment
-from tests.utils import make_yf_download_dummy_df
+  ShortTermOverheatingAssess, VolumeAssess, PriceBandVolumeAssess, WeakYenEnvAssess
+from tests.utils import make_yf_download_dummy_df, make_usd_jpy_m_avg_dummy_df
 
 client = TestClient(app)
 
+@patch("app.controllers.score.scoring_weak_yen_env_assess")
+@patch("app.controllers.score.compute_q")
+@patch("app.controllers.score.compute_m_avg_median")
+@patch("app.controllers.score.compute_usd_jpy_m_avg_df")
 @patch("app.controllers.score.compute_price_band_volume_ratio")
 @patch("app.controllers.score.scoring_price_band_volume_assessment")
 @patch("app.controllers.score.compute_average_volume")
@@ -29,7 +33,11 @@ def test_score_tickerは200レスポンスと正しいbodyを返す(
   mock_scoring_volume_assessment,
   mock_compute_average_volume,
   mock_scoring_price_band_volume_assessment,
-  mock_compute_price_band_volume_ratio
+  mock_compute_price_band_volume_ratio,
+  mock_compute_usd_jpy_m_avg_df,
+  mock_compute_m_avg_median,
+  mock_compute_q,
+  mock_scoring_weak_yen_env_assess,
 ):
   symbol = "7203.T"
   period = "5y"
@@ -37,6 +45,14 @@ def test_score_tickerは200レスポンスと正しいbodyを返す(
   mock_get_price_data.return_value = make_yf_download_dummy_df()
   mock_compute_rsi.return_value = 55.123
   mock_scoring_nikkei_momentum.return_value = 37.5
+
+  usd_jpy_m_avg_dummy_df = make_usd_jpy_m_avg_dummy_df()
+
+  mock_compute_usd_jpy_m_avg_df.return_value = usd_jpy_m_avg_dummy_df
+  current_rate = usd_jpy_m_avg_dummy_df.iloc[-1, 0]
+  mock_scoring_weak_yen_env_assess.return_value = 78.99
+  mock_compute_m_avg_median.return_value = 102.19
+  mock_compute_q.return_value = 12.23
 
   trend_weight = 0.4
   short_term_overheating_assessment_weight = 0.2
@@ -66,12 +82,19 @@ def test_score_tickerは200レスポンスと正しいbodyを返す(
     common_parameter=CommonParameter(
       symbol= symbol,
       period=period,
-      current_value=mock_get_price_data.return_value["Close"].iloc[-1].item()
+      symbol_current_price=mock_get_price_data.return_value["Close"].iloc[-1].item()
     ),
     market_condition = MarketCondition(
       nikkei_momentum = NikkeiMomentum(
         score = mock_scoring_nikkei_momentum.return_value,
         rsi = mock_compute_rsi.return_value
+      ),
+      weak_yen_env_assess=WeakYenEnvAssess(
+        score=mock_scoring_weak_yen_env_assess.return_value,
+        current_rate=current_rate,
+        m_avg_median=mock_compute_m_avg_median.return_value,
+        q10=mock_compute_q.return_value,
+        q90=mock_compute_q.return_value
       )
     ),
     technical=Technical(
@@ -86,16 +109,16 @@ def test_score_tickerは200レスポンスと正しいbodyを返す(
         ma_n=mock_compute_ma_n.return_value,
         deviation_rate=mock_compute_deviation_rate.return_value
       ),
-      short_term_overheating_assessment=ShortTermOverheatingAssessment(
+      short_term_overheating_assessment=ShortTermOverheatingAssess(
         score=mock_scoring_short_term_overheating_assessment.return_value,
         rsi=mock_compute_rsi.return_value
       ),
-      volume_assessment=VolumeAssessment(
+      volume_assessment=VolumeAssess(
         score=mock_scoring_volume_assessment.return_value,
         ave_vol_short=mock_compute_average_volume.return_value,
         ave_vol_long=mock_compute_average_volume.return_value,
       ),
-      price_band_volume_assessment=PriceBandVolumeAssessment(
+      price_band_volume_assessment=PriceBandVolumeAssess(
         score=mock_scoring_price_band_volume_assessment.return_value,
         price_band_volume_ratio=mock_compute_price_band_volume_ratio.return_value,
         band_ratio=band_ratio

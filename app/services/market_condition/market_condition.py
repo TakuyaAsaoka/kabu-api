@@ -22,3 +22,11 @@ def scoring_nikkei_momentum(rsi: float) -> float:
     return 50 + (rsi - 50) * 1.5
   else:
     return 0.0
+
+# 2 為替環境評価(円安)
+def scoring_weak_yen_env_assess(current_rate: float, m_avg_median: float, q10: float, q90: float):
+  if current_rate >= m_avg_median:
+    s = 50 + (current_rate - m_avg_median) * (50 / (q90 - m_avg_median))
+  else:
+    s = 50 - (m_avg_median - current_rate) * (50 / (m_avg_median - q10))
+  return max(0.0, min(100.0, s))

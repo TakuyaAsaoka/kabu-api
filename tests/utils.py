@@ -47,3 +47,17 @@ def make_yf_download_dummy_df() -> pd.DataFrame:
   df.index.name = "Date"
 
   return df
+
+def make_usd_jpy_m_avg_dummy_df() -> pd.DataFrame:
+  date_index = pd.date_range("2020-11-01", "2025-11-01", freq="ME")
+  n = len(date_index)
+  np.random.seed(42)
+
+  # ダミーの為替レート（日次）: 緩やかな上昇トレンド + ノイズ
+  rates = 105 + np.linspace(0, 10, n) + np.random.normal(0, 0.2, n)
+  cols = pd.MultiIndex.from_tuples([("JPY=X",)], names=["Ticker"])
+
+  df = pd.DataFrame(rates, index=date_index, columns=cols)
+  df.index.name = "Date"
+
+  return df

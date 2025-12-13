@@ -1,4 +1,4 @@
-from app.services.market_condition.rsi import compute_rsi
+from app.services.market_condition.nikkei_momentum.rsi import compute_rsi
 from tests.utils import make_yf_download_dummy_df
 
 dummy_df = make_yf_download_dummy_df()
