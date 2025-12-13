@@ -33,6 +33,11 @@ class PriceBandVolumeAssessment(BaseModel):
   band_ratio: float
 
 class Technical(BaseModel):
+  score: float
+  trend_weight: float
+  short_term_overheating_assessment_weight: float
+  volume_assessment_weight: float
+  price_band_volume_assessment_weight: float
   trend: Trend
   short_term_overheating_assessment: ShortTermOverheatingAssessment
   volume_assessment: VolumeAssessment

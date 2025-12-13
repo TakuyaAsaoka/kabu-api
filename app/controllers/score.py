@@ -48,7 +48,24 @@ def score_symbol(symbol: str, period: str) -> ScoreResponse:
   price_band_volume_ratio = compute_price_band_volume_ratio(df, current_price, band_ratio)
   price_band_volume_assessment_score = scoring_price_band_volume_assessment(price_band_volume_ratio)
 
+  trend_weight = 0.4
+  short_term_overheating_assessment_weight = 0.2
+  volume_assessment_weight = 0.2
+  price_band_volume_assessment_weight = 0.2
+
+  technical_score = (
+    trend_score * trend_weight +
+    short_term_overheating_assessment_score * short_term_overheating_assessment_weight +
+    volume_assessment_score * volume_assessment_weight +
+    price_band_volume_assessment_score * price_band_volume_assessment_weight
+  )
+
   technical = Technical(
+    score=technical_score,
+    trend_weight=trend_weight,
+    short_term_overheating_assessment_weight=short_term_overheating_assessment_weight,
+    volume_assessment_weight=volume_assessment_weight,
+    price_band_volume_assessment_weight=price_band_volume_assessment_weight,
     trend=Trend(
       score=trend_score,
       n=trend_n,

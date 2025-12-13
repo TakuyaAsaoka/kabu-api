@@ -38,6 +38,11 @@ def test_score_tickerは200レスポンスと正しいbodyを返す(
   mock_compute_rsi.return_value = 55.123
   mock_scoring_nikkei_momentum.return_value = 37.5
 
+  trend_weight = 0.4
+  short_term_overheating_assessment_weight = 0.2
+  volume_assessment_weight = 0.2
+  price_band_volume_assessment_weight = 0.2
+
   mock_compute_ma_n.return_value = 2203.12
   mock_compute_deviation_rate.return_value = 13.0
   mock_scoring_trend.return_value = 58.45
@@ -49,6 +54,13 @@ def test_score_tickerは200レスポンスと正しいbodyを返す(
   band_ratio=0.05
   mock_compute_price_band_volume_ratio.return_value = 0.21
   mock_scoring_price_band_volume_assessment.return_value = 30.8
+
+  technical_score = (
+    mock_scoring_trend.return_value * trend_weight +
+    mock_scoring_short_term_overheating_assessment.return_value * short_term_overheating_assessment_weight +
+    mock_scoring_volume_assessment.return_value * volume_assessment_weight +
+    mock_scoring_price_band_volume_assessment.return_value * price_band_volume_assessment_weight
+  )
 
   expected = ScoreResponse(
     common_parameter=CommonParameter(
@@ -63,6 +75,11 @@ def test_score_tickerは200レスポンスと正しいbodyを返す(
       )
     ),
     technical=Technical(
+      score=technical_score,
+      trend_weight=trend_weight,
+      short_term_overheating_assessment_weight=short_term_overheating_assessment_weight,
+      volume_assessment_weight=volume_assessment_weight,
+      price_band_volume_assessment_weight=price_band_volume_assessment_weight,
       trend=Trend(
         score=mock_scoring_trend.return_value,
         n=200,
