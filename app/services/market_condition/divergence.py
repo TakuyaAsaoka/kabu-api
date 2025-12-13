@@ -1,16 +1,13 @@
-from app.repositories.market_data import get_symbol_history
+import pandas as pd
 
-# TODO: tickerが固定されている...
-dummy_ticker = "7203.T"
+def compute_divergence(data: pd.DataFrame) -> float:
+  end_date = data.index.max()
+  start_date = end_date - pd.DateOffset(years=2)
+  close_prices_2y = data.loc[start_date:end_date, 'Close']
 
-def compute_divergence() -> float:
-  # TODO: 一度取得したhistoryから2yで切り出せるようにする
-  data = get_symbol_history(dummy_ticker, "2y")
-  close_prices = data['Close']
-
-  current_price_series = close_prices.iloc[-1]
+  current_price_series = close_prices_2y.iloc[-1]
   current_price = float(current_price_series.iloc[0])
-  median_series = close_prices.median()
+  median_series = close_prices_2y.median()
   median = float(median_series.iloc[0])
 
   divergence = (current_price - median) / median
