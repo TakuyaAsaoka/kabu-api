@@ -1,12 +1,14 @@
 from fastapi import APIRouter
 from ..repositories.market_data import get_price_data
 from ..schemas.score import ScoreResponse, MarketCondition, NikkeiMomentum, Technical, Trend, CommonParameter, \
-  ShortTermOverheatingAssessment
+  ShortTermOverheatingAssessment, VolumeAssessment
 from app.services.market_condition.rsi import compute_rsi
 from app.services.market_condition.market_condition import scoring_nikkei_momentum
-from ..services.technical.technical import scoring_trend, scoring_short_term_overheating_assessment
+from ..services.technical.technical import scoring_trend, scoring_short_term_overheating_assessment, \
+  scoring_volume_assessment
 from ..services.technical.trend.deviation_rate import compute_deviation_rate
 from ..services.technical.trend.ma_n import compute_ma_n
+from ..services.technical.volume_assessment.average_volume import compute_average_volume
 
 router = APIRouter(prefix="/score", tags=["Score"])
 
@@ -37,6 +39,10 @@ def score_symbol(symbol: str, period: str) -> ScoreResponse:
 
   short_term_overheating_assessment_score = scoring_short_term_overheating_assessment(computed_rsi)
 
+  ave_vol_short = compute_average_volume(df, 5)
+  ave_vol_long = compute_average_volume(df, 90)
+  volume_assessment_score = scoring_volume_assessment(ave_vol_short, ave_vol_long)
+
   technical = Technical(
     trend=Trend(
       score=trend_score,
@@ -47,6 +53,11 @@ def score_symbol(symbol: str, period: str) -> ScoreResponse:
     short_term_overheating_assessment=ShortTermOverheatingAssessment(
       score=short_term_overheating_assessment_score,
       rsi=computed_rsi
+    ),
+    volume_assessment=VolumeAssessment(
+      score=volume_assessment_score,
+      ave_vol_short=ave_vol_short,
+      ave_vol_long=ave_vol_long
     )
   )
 

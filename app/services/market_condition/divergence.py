@@ -1,8 +1,10 @@
 from app.repositories.market_data import get_symbol_history
 
+# TODO: tickerが固定されている...
 dummy_ticker = "7203.T"
 
 def compute_divergence() -> float:
+  # TODO: 一度取得したhistoryから2yで切り出せるようにする
   data = get_symbol_history(dummy_ticker, "2y")
   close_prices = data['Close']
 

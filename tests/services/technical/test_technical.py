@@ -1,6 +1,7 @@
 import pytest
 
-from app.services.technical.technical import scoring_trend, scoring_short_term_overheating_assessment
+from app.services.technical.technical import scoring_trend, scoring_short_term_overheating_assessment, \
+  scoring_volume_assessment
 
 
 @pytest.mark.parametrize("deviation_rate, expected", [
@@ -32,3 +33,22 @@ def test_トレンドを正しく算出できる(deviation_rate, expected):
 def test_短期過熱感評価を正しく算出できる(rsi, expected):
   actual = scoring_short_term_overheating_assessment(rsi)
   assert actual == pytest.approx(expected)
+
+
+@pytest.mark.parametrize("ave_vol_short, ave_vol_long, expected", [
+  # 基準値
+  (100, 100, 50.0),     # 出来高比率 = 1.0 → 50点
+
+  # 上昇ケース
+  (150, 100, 75.0),     # 1.5倍
+  (200, 100, 100.0),    # 2.0倍 → 上限
+  (300, 100, 100.0),    # 上限超過
+
+  # 下降ケース
+  (50, 100, 25.0),      # 0.5倍
+  (0, 100, 0.0),        # 最小
+])
+def test_出来高評価を正しく算出できる(ave_vol_short, ave_vol_long, expected):
+  result = scoring_volume_assessment(ave_vol_short, ave_vol_long)
+  assert result == pytest.approx(expected)
+

@@ -22,9 +22,15 @@ class ShortTermOverheatingAssessment(BaseModel):
   score: float
   rsi: float
 
+class VolumeAssessment(BaseModel):
+  score: float
+  ave_vol_short: float
+  ave_vol_long: float
+
 class Technical(BaseModel):
   trend: Trend
   short_term_overheating_assessment: ShortTermOverheatingAssessment
+  volume_assessment: VolumeAssessment
 
 class ScoreResponse(BaseModel):
   common_parameter: CommonParameter

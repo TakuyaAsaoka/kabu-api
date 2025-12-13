@@ -2,11 +2,13 @@ from fastapi.testclient import TestClient
 from unittest.mock import patch
 from app.main import app
 from app.schemas.score import ScoreResponse, MarketCondition, NikkeiMomentum, CommonParameter, Technical, Trend, \
-  ShortTermOverheatingAssessment
+  ShortTermOverheatingAssessment, VolumeAssessment
 from tests.utils import make_yf_download_dummy_df
 
 client = TestClient(app)
 
+@patch("app.controllers.score.compute_average_volume")
+@patch("app.controllers.score.scoring_volume_assessment")
 @patch("app.controllers.score.scoring_short_term_overheating_assessment")
 @patch("app.controllers.score.scoring_trend")
 @patch("app.controllers.score.compute_deviation_rate")
@@ -21,7 +23,9 @@ def test_score_tickerは200レスポンスと正しいbodyを返す(
   mock_compute_ma_n,
   mock_compute_deviation_rate,
   mock_scoring_trend,
-  mock_scoring_short_term_overheating_assessment
+  mock_scoring_short_term_overheating_assessment,
+  mock_scoring_volume_assessment,
+  mock_compute_average_volume
 ):
   symbol = "7203.T"
   period = "5y"
@@ -34,6 +38,9 @@ def test_score_tickerは200レスポンスと正しいbodyを返す(
   mock_compute_deviation_rate.return_value = 13.0
   mock_scoring_trend.return_value = 58.45
   mock_scoring_short_term_overheating_assessment.return_value = 43.1
+
+  mock_compute_average_volume.return_value = 10
+  mock_scoring_volume_assessment.return_value = 82.4
 
   expected = ScoreResponse(
     common_parameter=CommonParameter(
@@ -57,6 +64,11 @@ def test_score_tickerは200レスポンスと正しいbodyを返す(
       short_term_overheating_assessment=ShortTermOverheatingAssessment(
         score=mock_scoring_short_term_overheating_assessment.return_value,
         rsi=mock_compute_rsi.return_value
+      ),
+      volume_assessment=VolumeAssessment(
+        score=mock_scoring_volume_assessment.return_value,
+        ave_vol_short=mock_compute_average_volume.return_value,
+        ave_vol_long=mock_compute_average_volume.return_value,
       )
     )
   )
